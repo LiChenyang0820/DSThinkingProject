@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 # Load data
 data = pd.read_csv("data.csv")
-data = data.drop(columns=['time'])  # Remove 'time' feature
+data = data.drop(columns=['time'])
 
 # Features and target variable
 X = data.drop(columns=['DEATH_EVENT'])
@@ -35,7 +35,7 @@ for _ in range(100):
     X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3)
     
     # Train Random Forest model with increased complexity
-    rf_model = RandomForestClassifier(n_estimators=200, max_depth=10)  # Increase n_estimators and max_depth
+    rf_model = RandomForestClassifier(n_estimators=200, max_depth=10)
     rf_model.fit(X_train, y_train)
     
     # Predict and calculate metrics
@@ -67,11 +67,26 @@ average_ranking = sorted(
     key=lambda x: x[1]
 )
 
-features, avg_ranks = zip(*[(feature, avg_rank) for feature, avg_rank in average_ranking])
+feature_label_mapping = {
+    'serum_creatinine': 'Creatinine',
+    'ejection_fraction': 'Ejection.Fraction',
+    'age': 'Age',
+    'creatinine_phosphokinase': 'CPK',
+    'serum_sodium': 'Sodium',
+    'high_blood_pressure': 'BP',
+    'sex': 'Gender',
+    'smoking': 'Smoking',
+    'anaemia': 'Anaemia',
+    'diabetes': 'Diabetes',
+    'platelets': 'Platelets'
+}
 
-# Save feature ranking chart
+features, avg_ranks = zip(*[(feature, avg_rank) for feature, avg_rank in average_ranking])
+mapped_labels = [feature_label_mapping[feature] for feature in features]
+
+# Save feature ranking chart with mapped labels on y-axis
 plt.figure(figsize=(10, 6))
-plt.barh(features, avg_ranks, color='blue', height=0.5)
+plt.barh(mapped_labels, avg_ranks, color='blue', height=0.5)
 plt.xlabel('Average Rank')
 plt.title('Average Feature Ranking Over 100 Runs (Random Forest)')
 plt.gca().invert_yaxis()
@@ -81,40 +96,40 @@ for i, v in enumerate(avg_ranks):
     plt.text(v + 0.1, i, f'{v:.2f}', va='center')
 
 plt.tight_layout()
-plt.savefig('average_feature_ranking.png') 
+plt.savefig('RF_feature_ranking.png') 
 plt.close()
 
 # Calculate average metric scores
-avg_mcc = np.mean(mcc_scores)
-avg_f1 = np.mean(f1_scores)
 avg_accuracy = np.mean(accuracy_scores)
+avg_f1 = np.mean(f1_scores)
 avg_roc_auc = np.mean(roc_auc_scores)
+avg_mcc = np.mean(mcc_scores)
 
-# Metric names and average values
-metrics = ['MCC', 'F1 Score', 'Accuracy', 'ROC AUC']
-values = [avg_mcc, avg_f1, avg_accuracy, avg_roc_auc]
+# Metric names and average values in the specified order
+metrics = ['Accuracy', 'F1 Score', 'ROC AUC', 'MCC']
+values = [avg_accuracy, avg_f1, avg_roc_auc, avg_mcc]
 
-# Save evaluation metrics chart
+# Save evaluation metrics chart with specified format
 plt.figure(figsize=(8, 5))
-plt.bar(metrics, values, color=['green', 'purple', 'orange', 'red'])
+plt.bar(metrics, values, color='skyblue')
 plt.ylabel('Score')
 plt.title('Average Evaluation Metrics Over 100 Runs (Random Forest)')
 
-# Add value labels
+# Add value labels with six decimal places
 for i, v in enumerate(values):
-    plt.text(i, v + 0.01, f'{v:.3f}', ha='center')
+    plt.text(i, v + 0.01, f'{v:.6f}', ha='center')
 
 plt.tight_layout()
-plt.savefig('average_evaluation_metrics.png') 
+plt.savefig('RF_evaluation_metrics.png') 
 plt.close()
 
 # Output average metric values
-print(f"Average MCC: {avg_mcc:.3f}")
-print(f"Average F1 Score: {avg_f1:.3f}")
-print(f"Average Accuracy: {avg_accuracy:.3f}")
-print(f"Average ROC AUC: {avg_roc_auc:.3f}")
+print(f"Average Accuracy: {avg_accuracy:.6f}")
+print(f"Average F1 Score: {avg_f1:.6f}")
+print(f"Average ROC AUC: {avg_roc_auc:.6f}")
+print(f"Average MCC: {avg_mcc:.6f}")
 
 # Output average feature ranking
 print("\nAverage Feature Ranking:")
 for rank, (feature, avg_rank) in enumerate(average_ranking, start=1):
-    print(f"{rank}. Feature: {feature}, Average Rank: {avg_rank:.2f}")
+    print(f"{rank}. Feature: {feature_label_mapping[feature]}, Average Rank: {avg_rank:.2f}")
