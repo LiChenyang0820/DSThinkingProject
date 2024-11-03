@@ -86,7 +86,7 @@ mapped_labels = [feature_label_mapping[feature] for feature in features]
 
 # Save feature ranking chart with mapped labels on y-axis
 plt.figure(figsize=(10, 6))
-plt.barh(mapped_labels, avg_ranks, color='blue', height=0.5)
+plt.barh(mapped_labels, avg_ranks, color='skyblue', height=0.5)
 plt.xlabel('Average Rank')
 plt.title('Average Feature Ranking Over 100 Runs (Random Forest)')
 plt.gca().invert_yaxis()
@@ -111,7 +111,7 @@ values = [avg_accuracy, avg_f1, avg_roc_auc, avg_mcc]
 
 # Save evaluation metrics chart with specified format
 plt.figure(figsize=(8, 5))
-plt.bar(metrics, values, color='skyblue')
+plt.bar(metrics, values, color=['blue', 'green', 'red', 'skyblue'])
 plt.ylabel('Score')
 plt.title('Average Evaluation Metrics Over 100 Runs (Random Forest)')
 
